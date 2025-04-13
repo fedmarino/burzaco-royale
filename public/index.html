@@ -3,9 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <title>Burzaco Royale</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 </head>
 <body>
   <h1>Burzaco Royale</h1>
+
+  <h2>Tu perfil</h2>
+<div>
+  <p>Tu nombre: <span id="nombre">Anónimo</span></p>
+  <input type="text" id="nombreInput" placeholder="Elegí tu nombre">
+  <button id="guardarNombre">Guardar</button>
+</div>
+
+  
+  <h2>Ranking</h2>
+  <ol id="ranking"></ol>
+  
 
   <p>Respeto: <span id="respeto">0</span></p>
   <p>Partidas jugadas: <span id="partidas">0</span></p>
@@ -16,5 +31,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <!-- Código del juego -->
   <script src="main.js"></script>
+  
+  <img src="assets/fondo-callejero.png" alt="Burzaco Pixelado" class="footer-bg">
 </body>
 </html>
