@@ -1,62 +1,46 @@
-// Recuperar playerId
 let playerId = localStorage.getItem("playerId");
 if (!playerId) {
-  // Si no hay playerId, redirigimos al index
   window.location.href = "index.html";
 }
 
-// Conexión a Socket.io
-const socket = io({
-  query: { playerId }
-});
+const socket = io({ query: { playerId } });
 
 const estadoCombateEl = document.getElementById("estadoCombate");
 const golpearBtn = document.getElementById("golpearBtn");
 const volverBtn = document.getElementById("volverBtn");
 
-// Apenas carga la página, se emite “buscarCombate”
+// Apenas entrar, emitimos 'buscarCombate'
 socket.emit("buscarCombate");
 
-// Si no hay rival, el server manda “esperandoRival”
+// Esperando rival
 socket.on("esperandoRival", () => {
   estadoCombateEl.textContent = "Esperando rival...";
 });
 
-// Cuando hay un rival, nos mandan “startGame”
+// Emparejados => 'startGame'
 socket.on("startGame", () => {
   estadoCombateEl.textContent = "¡Pelea iniciada! Sé el primero en golpear.";
   golpearBtn.style.display = "inline-block";
 });
 
-// Al hacer clic en GOLPEAR, emitimos “tap” (un golpe)
+// Al golpear
 golpearBtn.addEventListener("click", () => {
-  console.log("Golpe lanzado!");
   socket.emit("tap");
-
-  // Evitamos varios golpes
   golpearBtn.style.display = "none";
 });
 
-// Al ganar
+// Victoria/derrota
 socket.on("victoria", () => {
   estadoCombateEl.textContent = "🔥 ¡Ganaste! Respeto actualizado.";
   volverBtn.style.display = "inline-block";
 });
 
-// Al perder
 socket.on("derrota", () => {
-  estadoCombateEl.textContent = "💀 ¡Perdiste! Otro día será.";
+  estadoCombateEl.textContent = "💀 ¡Fuiste vencido...!";
   volverBtn.style.display = "inline-block";
 });
 
-// Botón para volver al inicio (index.html)
+// Botón volver
 volverBtn.addEventListener("click", () => {
   window.location.href = "index.html";
 });
-
-// Al cerrar el navegador, se desconecta el socket
-window.addEventListener("beforeunload", () => {
-  socket.disconnect();
-});
-
-/************************************************************/
