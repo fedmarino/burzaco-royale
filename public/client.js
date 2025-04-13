@@ -26,7 +26,7 @@ socket.on("game-start", (data) => {
     let result = "";
 
     if (score > opponentScore) result = "¡Ganaste respeto del barrio!";
-    else if (score < opponentScore) result = "Te pasó el bondi... perdió.";
+    else if (score < opponentScore) result = "Te pasó el bondi... perdiste.";
     else result = "Empate, nos vimos en la esquina.";
 
     statusEl.textContent = result;
