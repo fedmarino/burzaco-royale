@@ -66,7 +66,16 @@ app.post("/api/cambiar-nombre", async (req, res) => {
 
 // Mostrar ranking global (GET)
 app.get("/api/ranking", async (req, res) => {
-  const ranking = await playersCollection
-    .find({}, { projection: { _id: 0, nombre: 1,_
-    }})
-})
+  try {
+    const ranking = await playersCollection
+      .find({}, { projection: { _id: 0, nombre: 1, respeto: 1 } })
+      .sort({ respeto: -1 })
+      .limit(10)
+      .toArray();
+
+    res.json(ranking);
+  } catch (err) {
+    console.error("❌ Error obteniendo ranking:", err);
+    res.status(500).send("Error interno al obtener ranking.");
+  }
+});
