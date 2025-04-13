@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Burzaco Royale - Combate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>¡Combate en Burzaco!</h1>
+
+  <div id="estadoCombate">Buscando rival...</div>
+  <button id="golpearBtn" style="display: none;">¡GOLPEAR!</button>
+
+  <!-- Botón para volver a la pantalla principal manualmente (por si querés) -->
+  <button id="volverBtn" style="display: none;">Volver al Inicio</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="combate.js"></script>
+</body>
+</html>

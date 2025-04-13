@@ -1,5 +1,5 @@
 /************************************************************/
-/*   1) Crear jugador si no existe (y guardar en local)     */
+/*  1) Crear jugador si no existe (y guardar en local)      */
 /************************************************************/
 let playerId = localStorage.getItem("playerId");
 
@@ -25,7 +25,7 @@ if (!playerId) {
 }
 
 /************************************************************/
-/*   2) Inicializar Socket.io y lógica de PvP               */
+/*  2) Inicializar Socket.io (para ver respeto, partidas)   */
 /************************************************************/
 function inicializarSocket() {
   const socket = io({
@@ -35,55 +35,16 @@ function inicializarSocket() {
   const respetoDisplay = document.getElementById("respeto");
   const partidasDisplay = document.getElementById("partidas");
 
-  // Al conectarse, el server envía "bienvenida"
   socket.on("bienvenida", (data) => {
     console.log("👋 Bienvenido de nuevo!");
     respetoDisplay.textContent = data.respeto;
     partidasDisplay.textContent = data.partidas;
-
-    // Mostrar nombre si ya lo tiene
     document.getElementById("nombre").textContent = data.nombre || "Anónimo";
   });
-
-  // Llamado cuando se arma un match
-  socket.on("startGame", () => {
-    console.log("💥 ¡Partida encontrada!");
-    // Acá podrías cambiar de pantalla o mostrar "En combate..."
-  });
-
-  // Si no hay rival
-  socket.on("esperandoRival", () => {
-    console.log("🕖 Esperando rival...");
-  });
-
-  // Victoria/derrota
-  socket.on("victoria", () => {
-    alert("🔥 ¡Ganaste respeto!");
-    // Sumamos 1 respeto y 1 partida a mano en la UI
-    respetoDisplay.textContent = parseInt(respetoDisplay.textContent) + 1;
-    partidasDisplay.textContent = parseInt(partidasDisplay.textContent) + 1;
-  });
-
-  socket.on("derrota", () => {
-    alert("💀 Fuiste vencido...");
-    // Sumamos 1 partida a mano en la UI
-    partidasDisplay.textContent = parseInt(partidasDisplay.textContent) + 1;
-  });
-
-  // Botón "GANAR RESPETO" emite "buscarCombate"
-  const ganarBtn = document.getElementById("ganarRespetoBtn");
-  ganarBtn.addEventListener("click", () => {
-    console.log("Buscando combate...");
-    socket.emit("buscarCombate");
-  });
-
-  // Cuando el usuario quiera "tapar" (golpear), podrías hacer:
-  // socket.emit("tap");
-  // Por ahora, hazlo manual, o como gustes integrarlo.
 }
 
 /************************************************************/
-/*   3) Guardar nombre en MongoDB (endpoint /api/cambiar-nombre) */
+/*  3) Cambiar nombre (POST a /api/cambiar-nombre)          */
 /************************************************************/
 document.getElementById("guardarNombre").addEventListener("click", async () => {
   const nuevoNombre = document.getElementById("nombreInput").value;
@@ -92,7 +53,6 @@ document.getElementById("guardarNombre").addEventListener("click", async () => {
     console.log("No se ingresó nombre");
     return;
   }
-
   if (!playerId) {
     console.log("No existe playerId en localStorage");
     return;
@@ -119,7 +79,7 @@ document.getElementById("guardarNombre").addEventListener("click", async () => {
 });
 
 /************************************************************/
-/*   4) Ranking global                                       */
+/*  4) Ranking global                                       */
 /************************************************************/
 async function cargarRanking() {
   try {
@@ -137,6 +97,13 @@ async function cargarRanking() {
     console.error("Error cargando ranking:", err);
   }
 }
-
-// Cargar ranking al iniciar
 cargarRanking();
+
+/************************************************************/
+/*  5) Botón "GANAR RESPETO" => se va a combate.html         */
+/************************************************************/
+document.getElementById("ganarRespetoBtn").addEventListener("click", () => {
+  // Redirigimos a la pantalla de combate
+  window.location.href = "combate.html";
+});
+/************************************************************/
