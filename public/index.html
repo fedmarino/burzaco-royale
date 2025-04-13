@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Burzaco Royale</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    #status { font-size: 1.5rem; margin-bottom: 1rem; }
+    #tapBtn { padding: 20px 40px; font-size: 1.5rem; display: none; }
+    #score { font-size: 1.2rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div id="status">Conectando al barrio...</div>
+  <button id="tapBtn">¡Tocá para ganar respeto!</button>
+  <div id="score"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
