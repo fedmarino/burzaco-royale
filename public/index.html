@@ -1,3 +1,4 @@
+<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="es">
 
@@ -24,7 +25,9 @@
 
     <!-- Sección de nombre (visible solo cuando estás logueado) -->
     <div id="seccionNombre" style="display: none;">
-        <p>Nombre: <span id="nombre">Anónimo</span> (<span id="respeto">0</span> respeto)</p>
+        <p>
+            Nombre: <span id="nombre">Anónimo</span> | Respeto: <span id="respetoUsuario">0</span> | Ranking: <span id="rankingUsuario">#0</span>
+        </p>
         <div id="cambiarNombre" style="display: none;">
             <input type="text" id="nombreInput" placeholder="Escribí tu nombre" />
             <input type="password" id="passwordInput" placeholder="Contraseña" />
@@ -36,7 +39,7 @@
 
     <!-- Sección de estadísticas -->
     <div id="estadisticas" style="display: none;">
-        <p>Respeto: <span id="respeto">0</span></p>
+        <p>Respeto: <span id="respetoStats">0</span></p>
         <p>Partidas jugadas: <span id="partidas">0</span></p>
     </div>
 
@@ -53,6 +56,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <!-- Lógica principal de la pantalla inicial -->
     <script src="main.js"></script>
+
     <img src="assets/fondo-callejero.png" alt="Burzaco Pixelado" class="footer-bg">
     <footer>
         <div id="notaalpie-bg">
