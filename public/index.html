@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Burzaco Royale - Inicio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Burzaco Royale</h1>
+
+    <!-- Sección de login -->
+    <div id="seccionLogin" style="display: none;">
+        <h2>Login</h2>
+        <input type="text" id="loginNombre" placeholder="Nombre" />
+        <input type="password" id="loginPassword" placeholder="Contraseña" />
+        <button id="loginBtn">Login</button>
+    </div>
+
+    <!-- Sección de nombre (visible solo cuando estás logueado) -->
+    <div id="seccionNombre" style="display: none;">
+        <p>Nombre: <span id="nombre">Anónimo</span></p>
+        <div id="cambiarNombre" style="display: none;">
+            <input type="text" id="nombreInput" placeholder="Escribí tu nombre" />
+            <input type="password" id="passwordInput" placeholder="Contraseña" />
+            <button id="guardarNombre">Guardar</button>
+        </div>
+        <button id="editarNombre" style="display: none;">Cambiar nombre</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <!-- Sección de estadísticas -->
+    <div id="estadisticas" style="display: none;">
+        <p>Respeto: <span id="respeto">0</span></p>
+        <p>Partidas jugadas: <span id="partidas">0</span></p>
+    </div>
+
+    <!-- Botón para pasar a la pantalla de combate -->
+    <button id="ganarRespetoBtn" style="display: none;">GANAR RESPETO</button>
+
+    <!-- Ranking -->
+    <h2>Ranking Barrial</h2>
+    <ol id="ranking"></ol>
+
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Lógica principal de la pantalla inicial -->
+    <script src="main.js"></script>
+    <img src="assets/fondo-callejero.png" alt="Burzaco Pixelado" class="footer-bg">
+    <footer>
+        <div id="notaalpie-bg">
+            <div id="notaalpie">
+                <p>Burzaco Royale - Todos los derechos reservados</p>
+                <p>Proyecto en curso por Federico Marino. Burzaco, Buenos Aires, Argentina</p>
+                <p>abril, 2025</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
