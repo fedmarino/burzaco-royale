@@ -76,14 +76,18 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 /*  4) Inicialización                                       */
 /************************************************************/
 if (!playerId) {
+    console.log("[Main] No hay playerId en localStorage, mostrando login");
     mostrarLogin();
 } else {
+    console.log("[Main] PlayerId encontrado en localStorage:", playerId);
     // Intentar login automático
     const nombre = localStorage.getItem("lastUsername");
     if (nombre) {
+        console.log("[Main] Intentando login automático con nombre:", nombre);
         document.getElementById("loginNombre").value = nombre;
         document.getElementById("loginBtn").click();
     } else {
+        console.log("[Main] No hay nombre guardado, intentando login con ID");
         // Si no hay nombre guardado pero sí playerId, intentar login con el ID
         fetch("/api/login", {
                 method: "POST",

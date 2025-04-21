@@ -114,6 +114,8 @@ socket.on("derrota", () => {
 
 // Botón volver
 volverBtn.addEventListener("click", () => {
+    console.log("[Combate] Guardando playerId antes de volver:", playerId);
+    localStorage.setItem("playerId", playerId);
     socket.disconnect();
     window.location.href = "index.html";
 });
