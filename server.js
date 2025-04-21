@@ -61,6 +61,72 @@ MongoClient.connect(MONGO_URL)
 
 // ... Otras rutas (create-player, /api/login, /api/ranking) sin cambios ...
 
+app.post("/api/login", async(req, res) => {
+    const { nombre, password, userId } = req.body;
+
+    try {
+        let jugador;
+
+        if (userId) {
+            // Login por userId (para sesiones existentes)
+            jugador = await playersCollection.findOne({ userId });
+            if (!jugador) {
+                return res.status(404).json({ error: "Usuario no encontrado" });
+            }
+        } else {
+            // Login por nombre y contraseña
+            if (!nombre || !password) {
+                return res.status(400).json({ error: "Faltan nombre o contraseña" });
+            }
+
+            const nombreNormalizado = normalizarNombre(nombre);
+            jugador = await playersCollection.findOne({ nombreNormalizado });
+
+            if (!jugador) {
+                return res.status(404).json({ error: "Usuario no encontrado" });
+            }
+
+            const passwordValido = await bcrypt.compare(password, jugador.password);
+            if (!passwordValido) {
+                return res.status(401).json({ error: "Contraseña incorrecta" });
+            }
+        }
+
+        // Obtener ranking del jugador
+        const ranking = await playersCollection
+            .find({ respeto: { $gt: 0 } })
+            .sort({ respeto: -1 })
+            .toArray();
+        const posicionRanking = ranking.findIndex(j => j.userId === jugador.userId) + 1;
+
+        res.json({
+            userId: jugador.userId,
+            nombre: jugador.nombre,
+            respeto: jugador.respeto || 0,
+            partidas: jugador.partidas || 0,
+            ranking: posicionRanking
+        });
+    } catch (error) {
+        console.error("Error en login:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
+app.get("/api/ranking", async(req, res) => {
+    try {
+        const ranking = await playersCollection
+            .find({ respeto: { $gt: 0 } })
+            .sort({ respeto: -1 })
+            .project({ nombre: 1, respeto: 1, partidas: 1, _id: 0 })
+            .toArray();
+
+        res.json(ranking);
+    } catch (error) {
+        console.error("Error obteniendo ranking:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
 app.post("/api/cambiar-nombre", async(req, res) => {
     const { userId, nombre, password } = req.body;
     if (!userId || !nombre || !password) {
