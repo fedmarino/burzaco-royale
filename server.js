@@ -58,9 +58,16 @@ function normalizarNombre(nombre) {
 
 // Función para validar contraseña
 function validarContrasena(contrasena) {
-    // Mínimo 8 caracteres, al menos una letra y un número
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return regex.test(contrasena);
+    if (contrasena.length < 8) {
+        return { valido: false, error: "La contraseña debe tener al menos 8 caracteres" };
+    }
+    if (!/[A-Za-z]/.test(contrasena)) {
+        return { valido: false, error: "La contraseña debe contener al menos una letra" };
+    }
+    if (!/\d/.test(contrasena)) {
+        return { valido: false, error: "La contraseña debe contener al menos un número" };
+    }
+    return { valido: true };
 }
 
 // Crear un nuevo jugador (GET)
@@ -120,10 +127,9 @@ app.post("/api/login", async(req, res) => {
 
     // Si el jugador no existe, lo creamos
     if (!jugador) {
-        if (!validarContrasena(password)) {
-            return res.status(400).json({
-                error: "La contraseña debe tener al menos 8 caracteres, incluyendo letras y números"
-            });
+        const validacion = validarContrasena(password);
+        if (!validacion.valido) {
+            return res.status(400).json({ error: validacion.error });
         }
 
         const userId = uuidv4();

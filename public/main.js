@@ -40,14 +40,14 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
             body: JSON.stringify({ nombre, password })
         });
 
+        const data = await res.json();
+
         if (!res.ok) {
-            const error = await res.json();
-            console.error("[Main] Error en login:", error);
-            alert(error.error || "Error al intentar login");
+            console.error("[Main] Error en login:", data);
+            alert(data.error || "Error al intentar login");
             return;
         }
 
-        const data = await res.json();
         playerId = data.userId;
         localStorage.setItem("playerId", playerId);
         isLoggedIn = true;
