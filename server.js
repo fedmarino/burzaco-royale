@@ -90,51 +90,83 @@ app.post("/api/login", async(req, res) => {
     if (!nombre || !password) return res.status(400).json({ error: "Faltan datos" });
 
     const nombreNormalizado = normalizarNombre(nombre);
-    const jugador = await playersCollection.findOne({ nombreNormalizado });
+    let jugador = await playersCollection.findOne({ nombreNormalizado });
 
+    // Si el jugador no existe, lo creamos
     if (!jugador) {
-        return res.status(401).json({ error: "Nombre o contraseña incorrectos" });
-    }
-
-    // Verificar si la cuenta está bloqueada
-    if (jugador.bloqueadoHasta && jugador.bloqueadoHasta > new Date()) {
-        const minutosRestantes = Math.ceil((jugador.bloqueadoHasta - new Date()) / 60000);
-        return res.status(403).json({
-            error: `Cuenta bloqueada. Intenta nuevamente en ${minutosRestantes} minutos`
-        });
-    }
-
-    // Verificar contraseña
-    const contrasenaValida = await bcrypt.compare(password, jugador.password);
-    if (!contrasenaValida) {
-        // Incrementar intentos fallidos
-        await playersCollection.updateOne({ userId: jugador.userId }, { $inc: { intentosLogin: 1 } });
-
-        // Bloquear cuenta después de 5 intentos fallidos
-        if (jugador.intentosLogin + 1 >= 5) {
-            const bloqueadoHasta = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
-            await playersCollection.updateOne({ userId: jugador.userId }, { $set: { bloqueadoHasta } });
-            return res.status(403).json({
-                error: "Demasiados intentos fallidos. Cuenta bloqueada por 15 minutos"
+        if (!validarContrasena(password)) {
+            return res.status(400).json({
+                error: "La contraseña debe tener al menos 8 caracteres, incluyendo letras y números"
             });
         }
 
-        return res.status(401).json({ error: "Nombre o contraseña incorrectos" });
-    }
+        const userId = uuidv4();
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Resetear intentos fallidos y bloqueo
-    await playersCollection.updateOne({ userId: jugador.userId }, {
-        $set: {
+        jugador = {
+            userId,
+            nombre,
+            nombreNormalizado,
+            respeto: 0,
+            partidas: 0,
+            creadoEn: new Date(),
+            password: hashedPassword,
             intentosLogin: 0,
             bloqueadoHasta: null
+        };
+
+        await playersCollection.insertOne(jugador);
+        console.log("🚀 Nuevo jugador creado:", nombre);
+    } else {
+        // Verificar si la cuenta está bloqueada
+        if (jugador.bloqueadoHasta && jugador.bloqueadoHasta > new Date()) {
+            const minutosRestantes = Math.ceil((jugador.bloqueadoHasta - new Date()) / 60000);
+            return res.status(403).json({
+                error: `Cuenta bloqueada. Intenta nuevamente en ${minutosRestantes} minutos`
+            });
         }
-    });
+
+        // Verificar contraseña
+        const contrasenaValida = await bcrypt.compare(password, jugador.password);
+        if (!contrasenaValida) {
+            // Incrementar intentos fallidos
+            await playersCollection.updateOne({ userId: jugador.userId }, { $inc: { intentosLogin: 1 } });
+
+            // Bloquear cuenta después de 5 intentos fallidos
+            if (jugador.intentosLogin + 1 >= 5) {
+                const bloqueadoHasta = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
+                await playersCollection.updateOne({ userId: jugador.userId }, { $set: { bloqueadoHasta } });
+                return res.status(403).json({
+                    error: "Demasiados intentos fallidos. Cuenta bloqueada por 15 minutos"
+                });
+            }
+
+            return res.status(401).json({ error: "Contraseña incorrecta" });
+        }
+
+        // Resetear intentos fallidos y bloqueo
+        await playersCollection.updateOne({ userId: jugador.userId }, {
+            $set: {
+                intentosLogin: 0,
+                bloqueadoHasta: null
+            }
+        });
+    }
+
+    // Obtener el ranking del jugador
+    const ranking = await playersCollection
+        .find({ respeto: { $gt: 0 } })
+        .sort({ respeto: -1 })
+        .toArray();
+
+    const posicionRanking = ranking.findIndex(j => j.userId === jugador.userId) + 1;
 
     res.json({
         userId: jugador.userId,
         nombre: jugador.nombre,
         respeto: jugador.respeto,
-        partidas: jugador.partidas
+        partidas: jugador.partidas,
+        ranking: posicionRanking
     });
 });
 

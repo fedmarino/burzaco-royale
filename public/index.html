@@ -15,14 +15,16 @@
     <!-- Sección de login -->
     <div id="seccionLogin" style="display: none;">
         <h2>Login</h2>
-        <input type="text" id="loginNombre" placeholder="Nombre" />
-        <input type="password" id="loginPassword" placeholder="Contraseña" />
-        <button id="loginBtn">Login</button>
+        <div class="login-form">
+            <input type="text" id="loginNombre" placeholder="Nombre" />
+            <input type="password" id="loginPassword" placeholder="Contraseña" />
+            <button id="loginBtn">Login</button>
+        </div>
     </div>
 
     <!-- Sección de nombre (visible solo cuando estás logueado) -->
     <div id="seccionNombre" style="display: none;">
-        <p>Nombre: <span id="nombre">Anónimo</span></p>
+        <p>Nombre: <span id="nombre">Anónimo</span> (<span id="respeto">0</span> respeto) <span id="ranking">#0</span></p>
         <div id="cambiarNombre" style="display: none;">
             <input type="text" id="nombreInput" placeholder="Escribí tu nombre" />
             <input type="password" id="passwordInput" placeholder="Contraseña" />

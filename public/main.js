@@ -55,6 +55,7 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
         document.getElementById("nombre").textContent = data.nombre;
         document.getElementById("respeto").textContent = data.respeto;
         document.getElementById("partidas").textContent = data.partidas;
+        document.getElementById("ranking").textContent = data.ranking > 0 ? `#${data.ranking}` : "";
 
         mostrarJuego();
         inicializarSocket();

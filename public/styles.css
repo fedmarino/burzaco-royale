@@ -140,3 +140,21 @@ button:hover {
     margin: 10px;
     font-family: 'Press Start 2P', cursive;
 }
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.login-form input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-form button {
+    width: 100%;
+    margin-top: 10px;
+}
