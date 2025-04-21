@@ -42,7 +42,8 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
 
         if (!res.ok) {
             const error = await res.json();
-            alert(error.error);
+            console.error("[Main] Error en login:", error);
+            alert(error.error || "Error al intentar login");
             return;
         }
 
@@ -60,8 +61,8 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
         mostrarJuego();
         inicializarSocket();
     } catch (error) {
-        console.error("Error en login:", error);
-        alert("Error al intentar login");
+        console.error("[Main] Error en login:", error);
+        alert("Error al intentar login. Por favor intenta nuevamente.");
     }
 });
 
