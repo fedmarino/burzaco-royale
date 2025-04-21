@@ -198,3 +198,29 @@ button:hover {
     width: 100%;
     margin-top: 10px;
 }
+
+.ranking-section {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+}
+
+.ranking-section h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+#rankingLista {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#rankingLista li {
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    text-align: center;
+}

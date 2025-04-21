@@ -24,7 +24,7 @@
 
     <!-- Sección de nombre (visible solo cuando estás logueado) -->
     <div id="seccionNombre" style="display: none;">
-        <p>Nombre: <span id="nombre">Anónimo</span> (<span id="respeto">0</span> respeto) <span id="ranking">#0</span></p>
+        <p>Nombre: <span id="nombre">Anónimo</span> (<span id="respeto">0</span> respeto)</p>
         <div id="cambiarNombre" style="display: none;">
             <input type="text" id="nombreInput" placeholder="Escribí tu nombre" />
             <input type="password" id="passwordInput" placeholder="Contraseña" />
@@ -44,8 +44,10 @@
     <button id="ganarRespetoBtn" style="display: none;">GANAR RESPETO</button>
 
     <!-- Ranking -->
-    <h2>Ranking Barrial</h2>
-    <ol id="ranking"></ol>
+    <div class="ranking-section">
+        <h2>Ranking Barrial</h2>
+        <ol id="rankingLista"></ol>
+    </div>
 
     <!-- Socket.io -->
     <script src="/socket.io/socket.io.js"></script>

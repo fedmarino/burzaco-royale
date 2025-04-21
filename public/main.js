@@ -95,7 +95,11 @@ if (!playerId) {
                 body: JSON.stringify({ userId: playerId })
             })
             .then(res => {
-                if (!res.ok) throw new Error("Error en login automático");
+                if (!res.ok) {
+                    console.log("[Main] Error en login automático, mostrando login");
+                    mostrarLogin();
+                    throw new Error("Error en login automático");
+                }
                 return res.json();
             })
             .then(data => {
@@ -114,7 +118,7 @@ if (!playerId) {
                 cargarRanking();
             })
             .catch(() => {
-                mostrarLogin();
+                // No mostrar login aquí, ya se mostró arriba si hubo error
             });
     }
 }
@@ -215,16 +219,16 @@ async function cargarRanking() {
         const ranking = await res.json();
         console.log("[Main] Ranking recibido:", ranking);
 
-        const lista = document.getElementById("ranking");
+        const lista = document.getElementById("rankingLista");
         if (!lista) {
-            console.error("[Main] No se encontró el elemento ranking en el DOM");
+            console.error("[Main] No se encontró el elemento rankingLista en el DOM");
             return;
         }
 
         lista.innerHTML = "";
         ranking.forEach((jugador, i) => {
             const li = document.createElement("li");
-            li.textContent = `${i + 1}. ${jugador.nombre} (${jugador.respeto} Respeto - ${jugador.partidas} Partidas)`;
+            li.textContent = `${i + 1}. ${jugador.nombre} (${jugador.respeto} Respeto)`;
             lista.appendChild(li);
         });
         console.log("[Main] Ranking actualizado en el DOM");
