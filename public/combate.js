@@ -10,11 +10,26 @@ const golpearBtn = document.getElementById("golpearBtn");
 const volverBtn = document.getElementById("volverBtn");
 const contadorToquesEl = document.getElementById("contadorToques");
 const tiempoRestanteEl = document.getElementById("tiempoRestante");
+const infoCombateEl = document.getElementById("infoCombate");
+
+// Elementos de información de jugadores
+const jugador1NombreEl = document.getElementById("jugador1Nombre");
+const jugador1RespetoEl = document.getElementById("jugador1Respeto");
+const jugador1RankingEl = document.getElementById("jugador1Ranking");
+const jugador2NombreEl = document.getElementById("jugador2Nombre");
+const jugador2RespetoEl = document.getElementById("jugador2Respeto");
+const jugador2RankingEl = document.getElementById("jugador2Ranking");
 
 let contadorToques = 0;
 let tiempoRestante = 5;
 let temporizador;
 let juegoActivo = false;
+
+// Cargar ranking inicial
+cargarRanking();
+
+// Actualizar ranking cada 30 segundos
+setInterval(cargarRanking, 30000);
 
 // Mostrar el botón de volver desde el inicio
 volverBtn.style.display = "inline-block";
@@ -26,13 +41,25 @@ socket.emit("buscarCombate");
 socket.on("esperandoRival", () => {
     estadoCombateEl.textContent = "Esperando rival...";
     golpearBtn.style.display = "none";
+    infoCombateEl.style.display = "none";
     reiniciarJuego();
 });
 
 // Emparejados => 'startGame'
-socket.on("startGame", () => {
+socket.on("startGame", (data) => {
     estadoCombateEl.textContent = "¡Pelea iniciada! Toca el botón lo más rápido que puedas por 5 segundos.";
     golpearBtn.style.display = "inline-block";
+    infoCombateEl.style.display = "flex";
+
+    // Actualizar información de los jugadores
+    jugador1NombreEl.textContent = data.jugador1.nombre;
+    jugador1RespetoEl.textContent = data.jugador1.respeto;
+    jugador1RankingEl.textContent = data.jugador1.ranking > 0 ? `#${data.jugador1.ranking}` : "#0";
+
+    jugador2NombreEl.textContent = data.jugador2.nombre;
+    jugador2RespetoEl.textContent = data.jugador2.respeto;
+    jugador2RankingEl.textContent = data.jugador2.ranking > 0 ? `#${data.jugador2.ranking}` : "#0";
+
     iniciarJuego();
 });
 
@@ -98,3 +125,21 @@ socket.on("disconnect", () => {
         window.location.href = "index.html";
     }, 2000);
 });
+
+// Función para cargar el ranking
+async function cargarRanking() {
+    try {
+        const res = await fetch("/api/ranking");
+        const ranking = await res.json();
+
+        const lista = document.getElementById("ranking");
+        lista.innerHTML = "";
+        ranking.forEach((jugador, i) => {
+            const li = document.createElement("li");
+            li.textContent = `${i + 1}. ${jugador.nombre} (${jugador.respeto} Respeto - ${jugador.partidas} Partidas)`;
+            lista.appendChild(li);
+        });
+    } catch (err) {
+        console.error("Error cargando ranking:", err);
+    }
+}

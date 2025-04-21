@@ -11,11 +11,30 @@
 <body>
     <h1>¡Combate en Burzaco!</h1>
 
+    <!-- Información de los jugadores -->
+    <div id="infoCombate" style="display: none;">
+        <div class="jugador-info">
+            <h3 id="jugador1Nombre">Jugador 1</h3>
+            <p>Respeto: <span id="jugador1Respeto">0</span></p>
+            <p>Ranking: <span id="jugador1Ranking">#0</span></p>
+        </div>
+        <div class="vs">VS</div>
+        <div class="jugador-info">
+            <h3 id="jugador2Nombre">Jugador 2</h3>
+            <p>Respeto: <span id="jugador2Respeto">0</span></p>
+            <p>Ranking: <span id="jugador2Ranking">#0</span></p>
+        </div>
+    </div>
+
     <div id="estadoCombate">Buscando rival...</div>
     <div id="contadorToques">Toques: 0</div>
     <div id="tiempoRestante">Tiempo: 5</div>
     <button id="golpearBtn" class="boton-grande" style="display: none;">¡GOLPEAR!</button>
     <button id="volverBtn" style="display: none;">Volver al Inicio</button>
+
+    <!-- Ranking -->
+    <h2>Ranking Barrial</h2>
+    <ol id="ranking"></ol>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="combate.js"></script>

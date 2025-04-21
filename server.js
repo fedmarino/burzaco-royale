@@ -86,7 +86,33 @@ app.get("/create-player", async(req, res) => {
 
 // Login (POST)
 app.post("/api/login", async(req, res) => {
-    const { nombre, password } = req.body;
+    const { nombre, password, userId } = req.body;
+
+    // Si se proporciona userId, intentar login directo
+    if (userId) {
+        const jugador = await playersCollection.findOne({ userId });
+        if (!jugador) {
+            return res.status(401).json({ error: "Usuario no encontrado" });
+        }
+
+        // Obtener el ranking del jugador
+        const ranking = await playersCollection
+            .find({ respeto: { $gt: 0 } })
+            .sort({ respeto: -1 })
+            .toArray();
+
+        const posicionRanking = ranking.findIndex(j => j.userId === jugador.userId) + 1;
+
+        return res.json({
+            userId: jugador.userId,
+            nombre: jugador.nombre,
+            respeto: jugador.respeto,
+            partidas: jugador.partidas,
+            ranking: posicionRanking
+        });
+    }
+
+    // Login normal con nombre y contraseña
     if (!nombre || !password) return res.status(400).json({ error: "Faltan datos" });
 
     const nombreNormalizado = normalizarNombre(nombre);
@@ -246,10 +272,49 @@ io.on('connection', (socket) => {
             jugadoresEnJuego.set(jugador1, 0);
             jugadoresEnJuego.set(jugador2, 0);
 
-            io.to(jugador1).emit('startGame');
-            io.to(jugador2).emit('startGame');
+            // Obtener información de los jugadores
+            Promise.all([
+                playersCollection.findOne({ userId: io.sockets.sockets.get(jugador1).handshake.query.playerId }),
+                playersCollection.findOne({ userId: io.sockets.sockets.get(jugador2).handshake.query.playerId })
+            ]).then(async([jugador1Data, jugador2Data]) => {
+                // Obtener ranking de ambos jugadores
+                const ranking = await playersCollection
+                    .find({ respeto: { $gt: 0 } })
+                    .sort({ respeto: -1 })
+                    .toArray();
 
-            console.log('Combate iniciado entre:', jugador1, 'y', jugador2);
+                const jugador1Ranking = ranking.findIndex(j => j.userId === jugador1Data.userId) + 1;
+                const jugador2Ranking = ranking.findIndex(j => j.userId === jugador2Data.userId) + 1;
+
+                // Enviar información a ambos jugadores
+                io.to(jugador1).emit('startGame', {
+                    jugador1: {
+                        nombre: jugador1Data.nombre,
+                        respeto: jugador1Data.respeto,
+                        ranking: jugador1Ranking
+                    },
+                    jugador2: {
+                        nombre: jugador2Data.nombre,
+                        respeto: jugador2Data.respeto,
+                        ranking: jugador2Ranking
+                    }
+                });
+
+                io.to(jugador2).emit('startGame', {
+                    jugador1: {
+                        nombre: jugador2Data.nombre,
+                        respeto: jugador2Data.respeto,
+                        ranking: jugador2Ranking
+                    },
+                    jugador2: {
+                        nombre: jugador1Data.nombre,
+                        respeto: jugador1Data.respeto,
+                        ranking: jugador1Ranking
+                    }
+                });
+
+                console.log('Combate iniciado entre:', jugador1Data.nombre, 'y', jugador2Data.nombre);
+            });
         } else {
             socket.emit('esperandoRival');
         }

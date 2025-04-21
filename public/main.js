@@ -84,7 +84,33 @@ if (!playerId) {
         document.getElementById("loginNombre").value = nombre;
         document.getElementById("loginBtn").click();
     } else {
-        mostrarLogin();
+        // Si no hay nombre guardado pero sí playerId, intentar login con el ID
+        fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: playerId })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Error en login automático");
+                return res.json();
+            })
+            .then(data => {
+                playerId = data.userId;
+                isLoggedIn = true;
+                localStorage.setItem("lastUsername", data.nombre);
+
+                // Actualizar UI
+                document.getElementById("nombre").textContent = data.nombre;
+                document.getElementById("respeto").textContent = data.respeto;
+                document.getElementById("partidas").textContent = data.partidas;
+                document.getElementById("ranking").textContent = data.ranking > 0 ? `#${data.ranking}` : "";
+
+                mostrarJuego();
+                inicializarSocket();
+            })
+            .catch(() => {
+                mostrarLogin();
+            });
     }
 }
 
@@ -181,14 +207,19 @@ async function cargarRanking() {
         lista.innerHTML = "";
         ranking.forEach((jugador, i) => {
             const li = document.createElement("li");
-            li.textContent = `${i + 1}. ${jugador.nombre} (${jugador.respeto} Respeto)`;
+            li.textContent = `${i + 1}. ${jugador.nombre} (${jugador.respeto} Respeto - ${jugador.partidas} Partidas)`;
             lista.appendChild(li);
         });
     } catch (err) {
         console.error("Error cargando ranking:", err);
     }
 }
+
+// Cargar ranking inicial
 cargarRanking();
+
+// Actualizar ranking cada 30 segundos
+setInterval(cargarRanking, 30000);
 
 /************************************************************/
 /*  8) Combate                                              */
