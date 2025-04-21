@@ -72,10 +72,15 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
         isLoggedIn = true;
 
         // Actualizar UI
-        document.getElementById("nombre").textContent = data.nombre;
-        document.getElementById("respeto").textContent = data.respeto;
-        document.getElementById("partidas").textContent = data.partidas;
-        document.getElementById("ranking").textContent = data.ranking > 0 ? `#${data.ranking}` : "";
+        const nombreElement = document.getElementById("nombre");
+        const respetoElement = document.getElementById("respeto");
+        const partidasElement = document.getElementById("partidas");
+        const rankingElement = document.getElementById("ranking");
+
+        if (nombreElement) nombreElement.textContent = data.nombre;
+        if (respetoElement) respetoElement.textContent = data.respeto;
+        if (partidasElement) partidasElement.textContent = data.partidas;
+        if (rankingElement) rankingElement.textContent = data.ranking > 0 ? `#${data.ranking}` : "";
 
         console.log("[Main] Login exitoso, mostrando juego");
         mostrarJuego();
