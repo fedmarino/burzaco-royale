@@ -111,6 +111,7 @@ if (!playerId) {
 
                 mostrarJuego();
                 inicializarSocket();
+                cargarRanking();
             })
             .catch(() => {
                 mostrarLogin();
@@ -149,6 +150,7 @@ function inicializarSocket() {
     });
 
     socket.on("actualizarPuntaje", (data) => {
+        console.log("[Main] Actualizando puntaje:", data);
         respetoDisplay.textContent = data.respeto;
         partidasDisplay.textContent = data.partidas;
         cargarRanking();
@@ -204,18 +206,30 @@ document.getElementById("editarNombre").addEventListener("click", () => {
 /************************************************************/
 async function cargarRanking() {
     try {
+        console.log("[Main] Cargando ranking...");
         const res = await fetch("/api/ranking");
+        if (!res.ok) {
+            console.error("[Main] Error en la respuesta del ranking:", res.status);
+            return;
+        }
         const ranking = await res.json();
+        console.log("[Main] Ranking recibido:", ranking);
 
         const lista = document.getElementById("ranking");
+        if (!lista) {
+            console.error("[Main] No se encontró el elemento ranking en el DOM");
+            return;
+        }
+
         lista.innerHTML = "";
         ranking.forEach((jugador, i) => {
             const li = document.createElement("li");
             li.textContent = `${i + 1}. ${jugador.nombre} (${jugador.respeto} Respeto - ${jugador.partidas} Partidas)`;
             lista.appendChild(li);
         });
+        console.log("[Main] Ranking actualizado en el DOM");
     } catch (err) {
-        console.error("Error cargando ranking:", err);
+        console.error("[Main] Error cargando ranking:", err);
     }
 }
 
