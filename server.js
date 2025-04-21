@@ -93,12 +93,15 @@ app.get("/create-player", async(req, res) => {
 
 // Login (POST)
 app.post("/api/login", async(req, res) => {
+    console.log("[Server] Intento de login:", { nombre: req.body.nombre, userId: req.body.userId });
     const { nombre, password, userId } = req.body;
 
     // Si se proporciona userId, intentar login directo
     if (userId) {
+        console.log("[Server] Intentando login con userId:", userId);
         const jugador = await playersCollection.findOne({ userId });
         if (!jugador) {
+            console.log("[Server] Usuario no encontrado con userId:", userId);
             return res.status(401).json({ error: "Usuario no encontrado" });
         }
 
@@ -110,6 +113,7 @@ app.post("/api/login", async(req, res) => {
 
         const posicionRanking = ranking.findIndex(j => j.userId === jugador.userId) + 1;
 
+        console.log("[Server] Login exitoso con userId:", userId);
         return res.json({
             userId: jugador.userId,
             nombre: jugador.nombre,
@@ -120,15 +124,21 @@ app.post("/api/login", async(req, res) => {
     }
 
     // Login normal con nombre y contraseña
-    if (!nombre || !password) return res.status(400).json({ error: "Faltan datos" });
+    if (!nombre || !password) {
+        console.log("[Server] Faltan datos para login");
+        return res.status(400).json({ error: "Faltan datos" });
+    }
 
     const nombreNormalizado = normalizarNombre(nombre);
+    console.log("[Server] Buscando jugador con nombre normalizado:", nombreNormalizado);
     let jugador = await playersCollection.findOne({ nombreNormalizado });
 
     // Si el jugador no existe, lo creamos
     if (!jugador) {
+        console.log("[Server] Jugador no encontrado, creando nuevo");
         const validacion = validarContrasena(password);
         if (!validacion.valido) {
+            console.log("[Server] Contraseña inválida:", validacion.error);
             return res.status(400).json({ error: validacion.error });
         }
 
@@ -148,11 +158,13 @@ app.post("/api/login", async(req, res) => {
         };
 
         await playersCollection.insertOne(jugador);
-        console.log("🚀 Nuevo jugador creado:", nombre);
+        console.log("[Server] Nuevo jugador creado:", nombre);
     } else {
+        console.log("[Server] Jugador encontrado, verificando contraseña");
         // Verificar si la cuenta está bloqueada
         if (jugador.bloqueadoHasta && jugador.bloqueadoHasta > new Date()) {
             const minutosRestantes = Math.ceil((jugador.bloqueadoHasta - new Date()) / 60000);
+            console.log("[Server] Cuenta bloqueada, minutos restantes:", minutosRestantes);
             return res.status(403).json({
                 error: `Cuenta bloqueada. Intenta nuevamente en ${minutosRestantes} minutos`
             });
@@ -160,6 +172,7 @@ app.post("/api/login", async(req, res) => {
 
         // Verificar contraseña
         const contrasenaValida = await bcrypt.compare(password, jugador.password);
+        console.log("[Server] Resultado de comparación de contraseña:", contrasenaValida);
         if (!contrasenaValida) {
             // Incrementar intentos fallidos
             await playersCollection.updateOne({ userId: jugador.userId }, { $inc: { intentosLogin: 1 } });
@@ -168,11 +181,13 @@ app.post("/api/login", async(req, res) => {
             if (jugador.intentosLogin + 1 >= 5) {
                 const bloqueadoHasta = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
                 await playersCollection.updateOne({ userId: jugador.userId }, { $set: { bloqueadoHasta } });
+                console.log("[Server] Cuenta bloqueada por demasiados intentos");
                 return res.status(403).json({
                     error: "Demasiados intentos fallidos. Cuenta bloqueada por 15 minutos"
                 });
             }
 
+            console.log("[Server] Contraseña incorrecta");
             return res.status(401).json({ error: "Contraseña incorrecta" });
         }
 
@@ -193,6 +208,7 @@ app.post("/api/login", async(req, res) => {
 
     const posicionRanking = ranking.findIndex(j => j.userId === jugador.userId) + 1;
 
+    console.log("[Server] Login exitoso para:", jugador.nombre);
     res.json({
         userId: jugador.userId,
         nombre: jugador.nombre,

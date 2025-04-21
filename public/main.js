@@ -8,17 +8,27 @@ let isLoggedIn = false;
 /*  2) Funciones de UI                                      */
 /************************************************************/
 function mostrarLogin() {
-    document.getElementById("seccionLogin").style.display = "block";
-    document.getElementById("seccionNombre").style.display = "none";
-    document.getElementById("estadisticas").style.display = "none";
-    document.getElementById("ganarRespetoBtn").style.display = "none";
+    const seccionLogin = document.getElementById("seccionLogin");
+    const seccionNombre = document.getElementById("seccionNombre");
+    const estadisticas = document.getElementById("estadisticas");
+    const ganarRespetoBtn = document.getElementById("ganarRespetoBtn");
+
+    if (seccionLogin) seccionLogin.style.display = "block";
+    if (seccionNombre) seccionNombre.style.display = "none";
+    if (estadisticas) estadisticas.style.display = "none";
+    if (ganarRespetoBtn) ganarRespetoBtn.style.display = "none";
 }
 
 function mostrarJuego() {
-    document.getElementById("seccionLogin").style.display = "none";
-    document.getElementById("seccionNombre").style.display = "block";
-    document.getElementById("estadisticas").style.display = "block";
-    document.getElementById("ganarRespetoBtn").style.display = "inline-block";
+    const seccionLogin = document.getElementById("seccionLogin");
+    const seccionNombre = document.getElementById("seccionNombre");
+    const estadisticas = document.getElementById("estadisticas");
+    const ganarRespetoBtn = document.getElementById("ganarRespetoBtn");
+
+    if (seccionLogin) seccionLogin.style.display = "none";
+    if (seccionNombre) seccionNombre.style.display = "block";
+    if (estadisticas) estadisticas.style.display = "block";
+    if (ganarRespetoBtn) ganarRespetoBtn.style.display = "inline-block";
 }
 
 /************************************************************/
@@ -34,6 +44,7 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
     }
 
     try {
+        console.log("[Main] Intentando login con:", nombre);
         const res = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -41,6 +52,7 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
         });
 
         const data = await res.json();
+        console.log("[Main] Respuesta del servidor:", data);
 
         if (!res.ok) {
             console.error("[Main] Error en login:", data);
@@ -48,8 +60,15 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
             return;
         }
 
+        if (!data.userId) {
+            console.error("[Main] No se recibió userId en la respuesta");
+            alert("Error: No se recibió el ID del usuario");
+            return;
+        }
+
         playerId = data.userId;
         localStorage.setItem("playerId", playerId);
+        localStorage.setItem("lastUsername", nombre);
         isLoggedIn = true;
 
         // Actualizar UI
@@ -58,6 +77,7 @@ document.getElementById("loginBtn").addEventListener("click", async() => {
         document.getElementById("partidas").textContent = data.partidas;
         document.getElementById("ranking").textContent = data.ranking > 0 ? `#${data.ranking}` : "";
 
+        console.log("[Main] Login exitoso, mostrando juego");
         mostrarJuego();
         inicializarSocket();
     } catch (error) {
@@ -98,28 +118,38 @@ if (!playerId) {
             .then(res => {
                 if (!res.ok) {
                     console.log("[Main] Error en login automático, mostrando login");
+                    localStorage.removeItem("playerId"); // Limpiar playerId inválido
                     mostrarLogin();
-                    throw new Error("Error en login automático");
+                    return;
                 }
                 return res.json();
             })
             .then(data => {
+                if (!data) return; // Si no hay data, ya se mostró el login
+
                 playerId = data.userId;
                 isLoggedIn = true;
                 localStorage.setItem("lastUsername", data.nombre);
 
                 // Actualizar UI
-                document.getElementById("nombre").textContent = data.nombre;
-                document.getElementById("respeto").textContent = data.respeto;
-                document.getElementById("partidas").textContent = data.partidas;
-                document.getElementById("ranking").textContent = data.ranking > 0 ? `#${data.ranking}` : "";
+                const nombreElement = document.getElementById("nombre");
+                const respetoElement = document.getElementById("respeto");
+                const partidasElement = document.getElementById("partidas");
+                const rankingElement = document.getElementById("ranking");
+
+                if (nombreElement) nombreElement.textContent = data.nombre;
+                if (respetoElement) respetoElement.textContent = data.respeto;
+                if (partidasElement) partidasElement.textContent = data.partidas;
+                if (rankingElement) rankingElement.textContent = data.ranking > 0 ? `#${data.ranking}` : "";
 
                 mostrarJuego();
                 inicializarSocket();
                 cargarRanking();
             })
-            .catch(() => {
-                // No mostrar login aquí, ya se mostró arriba si hubo error
+            .catch(error => {
+                console.error("[Main] Error en login automático:", error);
+                localStorage.removeItem("playerId"); // Limpiar playerId inválido
+                mostrarLogin();
             });
     }
 }
