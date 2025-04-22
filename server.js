@@ -288,6 +288,7 @@ app.get("/api/ranking", async(req, res) => {
 // =======================================
 let jugadoresEnEspera = [];
 let jugadoresEnJuego = new Map(); // Almacena los toques de cada jugador
+let partidasEnProceso = new Set(); // Nuevo: para controlar partidas ya procesadas
 
 io.on('connection', (socket) => {
     console.log('Nuevo jugador conectado:', socket.id);
@@ -355,9 +356,18 @@ io.on('connection', (socket) => {
     socket.on('finJuego', async(toques) => {
         const playerId = socket.handshake.query.playerId;
         console.log("[Server] Recibido finJuego de", playerId, "con", toques, "toques");
+
+        // Verificar si esta partida ya fue procesada
+        const partidaId = `${socket.id}-${Date.now()}`;
+        if (partidasEnProceso.has(partidaId)) {
+            console.log("[Server] Partida ya procesada, ignorando");
+            return;
+        }
+        partidasEnProceso.add(partidaId);
+
         jugadoresEnJuego.set(socket.id, toques);
 
-        // Verificar si ambos jugadores han terminado o si ha pasado suficiente tiempo
+        // Verificar si ambos jugadores han terminado
         const jugadores = Array.from(jugadoresEnJuego.entries());
         if (jugadores.length === 2) {
             const [jugador1, toques1] = jugadores[0];
@@ -374,6 +384,8 @@ io.on('connection', (socket) => {
                     // Actualizar partidas jugadas de ambos jugadores
                     const jugador1Id = io.sockets.sockets.get(jugador1).handshake.query.playerId;
                     const jugador2Id = io.sockets.sockets.get(jugador2).handshake.query.playerId;
+
+                    console.log("[Server] Actualizando empate para jugadores:", jugador1Id, "y", jugador2Id);
 
                     const resultado1 = await playersCollection.findOneAndUpdate({ userId: jugador1Id }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
 
@@ -394,9 +406,9 @@ io.on('connection', (socket) => {
                         partidas: resultado2.value.partidas
                     });
 
-                    console.log(`Empate entre ${jugador1Id} y ${jugador2Id}`);
+                    console.log(`[Server] Empate procesado entre ${jugador1Id} y ${jugador2Id}`);
                 } catch (err) {
-                    console.error('Error actualizando puntuaciones:', err);
+                    console.error('[Server] Error actualizando puntuaciones:', err);
                     io.to(jugador1).emit('error', 'Error al actualizar puntuación');
                     io.to(jugador2).emit('error', 'Error al actualizar puntuación');
                 }
@@ -417,10 +429,12 @@ io.on('connection', (socket) => {
                 try {
                     // Actualizar el respeto del ganador y partidas jugadas
                     const ganadorId = io.sockets.sockets.get(ganador).handshake.query.playerId;
+                    const perdedorId = io.sockets.sockets.get(perdedor).handshake.query.playerId;
+
+                    console.log("[Server] Actualizando victoria/derrota para jugadores:", ganadorId, "y", perdedorId);
+
                     const resultadoGanador = await playersCollection.findOneAndUpdate({ userId: ganadorId }, { $inc: { respeto: 1, partidas: 1 } }, { returnDocument: 'after' });
 
-                    // Actualizar partidas jugadas del perdedor
-                    const perdedorId = io.sockets.sockets.get(perdedor).handshake.query.playerId;
                     const resultadoPerdedor = await playersCollection.findOneAndUpdate({ userId: perdedorId }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
 
                     // Notificar a los jugadores
@@ -438,9 +452,9 @@ io.on('connection', (socket) => {
                         partidas: resultadoPerdedor.value.partidas
                     });
 
-                    console.log(`Jugador ${ganadorId} ganó con ${Math.max(toques1, toques2)} toques`);
+                    console.log(`[Server] Victoria procesada para ${ganadorId} con ${Math.max(toques1, toques2)} toques`);
                 } catch (err) {
-                    console.error('Error actualizando puntuaciones:', err);
+                    console.error('[Server] Error actualizando puntuaciones:', err);
                     io.to(ganador).emit('error', 'Error al actualizar puntuación');
                     io.to(perdedor).emit('error', 'Error al actualizar puntuación');
                 }
@@ -448,6 +462,8 @@ io.on('connection', (socket) => {
 
             // Limpiar estado del juego
             jugadoresEnJuego.clear();
+            // Limpiar la partida procesada después de un tiempo
+            setTimeout(() => partidasEnProceso.delete(partidaId), 10000);
         }
     });
 
