@@ -413,9 +413,12 @@ button:hover {
     text-transform: uppercase;
     box-shadow: 0 0 12px #ff0000;
     margin: 0 auto;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     border-radius: 50%;
+    overflow: hidden;
 }
 
 .boton-principal::before {
@@ -430,12 +433,13 @@ button:hover {
     z-index: 1;
 }
 
-.boton-principal span {
-    position: relative;
-    z-index: 2;
-    display: block;
-    margin-top: 50%;
-    transform: translateY(-50%);
+.boton-principal:hover {
+    transform: scale(1.05);
+    background-color: #ff3333;
+}
+
+.boton-principal:active {
+    transform: scale(0.95);
 }
 
 @media (max-width: 768px) {

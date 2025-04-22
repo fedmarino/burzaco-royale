@@ -106,14 +106,26 @@ golpearBtn.addEventListener("click", () => {
 // Resultados
 socket.on("victoria", () => {
     estadoCombateEl.textContent = "🔥 ¡Ganaste! Respeto actualizado.";
+    setTimeout(() => {
+        socket.disconnect();
+        window.location.href = "index.html";
+    }, 5000);
 });
 
 socket.on("derrota", () => {
     estadoCombateEl.textContent = "💀 ¡Fuiste vencido...!";
+    setTimeout(() => {
+        socket.disconnect();
+        window.location.href = "index.html";
+    }, 5000);
 });
 
 socket.on("empate", () => {
     estadoCombateEl.textContent = "🤝 ¡Empate! Nadie ganó respeto.";
+    setTimeout(() => {
+        socket.disconnect();
+        window.location.href = "index.html";
+    }, 5000);
 });
 
 // Botón volver
