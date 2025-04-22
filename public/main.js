@@ -106,57 +106,55 @@ if (!playerId) {
     mostrarLogin();
 } else {
     console.log("[Main] PlayerId encontrado en localStorage:", playerId);
-    // Intentar login automático
-    const nombre = localStorage.getItem("lastUsername");
-    if (nombre) {
-        console.log("[Main] Intentando login automático con nombre:", nombre);
-        document.getElementById("loginNombre").value = nombre;
-        document.getElementById("loginBtn").click();
-    } else {
-        console.log("[Main] No hay nombre guardado, intentando login con ID");
-        // Si no hay nombre guardado pero sí playerId, intentar login con el ID
-        fetch("/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: playerId })
-            })
-            .then(res => {
-                if (!res.ok) {
-                    console.log("[Main] Error en login automático, mostrando login");
+    // Primero intentar login con playerId
+    fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: playerId })
+        })
+        .then(res => {
+            if (!res.ok) {
+                console.log("[Main] Error en login automático con playerId, intentando con nombre");
+                const nombre = localStorage.getItem("lastUsername");
+                if (nombre) {
+                    document.getElementById("loginNombre").value = nombre;
+                    document.getElementById("loginBtn").click();
+                } else {
+                    console.log("[Main] No hay nombre guardado, mostrando login");
                     localStorage.removeItem("playerId"); // Limpiar playerId inválido
                     mostrarLogin();
-                    return;
                 }
-                return res.json();
-            })
-            .then(data => {
-                if (!data) return; // Si no hay data, ya se mostró el login
+                return;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return; // Si no hay data, ya se mostró el login
 
-                playerId = data.userId;
-                isLoggedIn = true;
-                localStorage.setItem("lastUsername", data.nombre);
+            playerId = data.userId;
+            isLoggedIn = true;
+            localStorage.setItem("lastUsername", data.nombre);
 
-                // Actualizar UI
-                const nombreElement = document.getElementById("nombre");
-                const respetoElement = document.getElementById("respeto");
-                const partidasElement = document.getElementById("partidas");
-                const rankingElement = document.getElementById("ranking");
+            // Actualizar UI
+            const nombreElement = document.getElementById("nombre");
+            const respetoElement = document.getElementById("respeto");
+            const partidasElement = document.getElementById("partidas");
+            const rankingElement = document.getElementById("ranking");
 
-                if (nombreElement) nombreElement.textContent = data.nombre;
-                if (respetoElement) respetoElement.textContent = data.respeto;
-                if (partidasElement) partidasElement.textContent = data.partidas;
-                if (rankingElement) rankingElement.textContent = data.ranking > 0 ? `#${data.ranking}` : "";
+            if (nombreElement) nombreElement.textContent = data.nombre;
+            if (respetoElement) respetoElement.textContent = data.respeto;
+            if (partidasElement) partidasElement.textContent = data.partidas;
+            if (rankingElement) rankingElement.textContent = data.ranking > 0 ? `#${data.ranking}` : "";
 
-                mostrarJuego();
-                inicializarSocket();
-                cargarRanking();
-            })
-            .catch(error => {
-                console.error("[Main] Error en login automático:", error);
-                localStorage.removeItem("playerId"); // Limpiar playerId inválido
-                mostrarLogin();
-            });
-    }
+            mostrarJuego();
+            inicializarSocket();
+            cargarRanking();
+        })
+        .catch(error => {
+            console.error("[Main] Error en login automático:", error);
+            localStorage.removeItem("playerId"); // Limpiar playerId inválido
+            mostrarLogin();
+        });
 }
 
 /************************************************************/
