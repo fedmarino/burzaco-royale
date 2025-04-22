@@ -112,6 +112,10 @@ socket.on("derrota", () => {
     estadoCombateEl.textContent = "💀 ¡Fuiste vencido...!";
 });
 
+socket.on("empate", () => {
+    estadoCombateEl.textContent = "🤝 ¡Empate! Nadie ganó respeto.";
+});
+
 // Botón volver
 volverBtn.addEventListener("click", () => {
     console.log("[Combate] Guardando playerId antes de volver:", playerId);

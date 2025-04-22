@@ -356,46 +356,88 @@ io.on('connection', (socket) => {
         const playerId = socket.handshake.query.playerId;
         jugadoresEnJuego.set(socket.id, toques);
 
-        // Verificar si ambos jugadores han terminado
+        // Verificar si ambos jugadores han terminado o si ha pasado suficiente tiempo
         const jugadores = Array.from(jugadoresEnJuego.entries());
-        if (jugadores.length === 2 && jugadores.every(([_, toques]) => toques > 0)) {
+        if (jugadores.length === 2) {
             const [jugador1, toques1] = jugadores[0];
             const [jugador2, toques2] = jugadores[1];
 
-            const ganador = toques1 > toques2 ? jugador1 : jugador2;
-            const perdedor = toques1 > toques2 ? jugador2 : jugador1;
+            // Si ambos jugadores tienen 0 toques, es un empate
+            if (toques1 === 0 && toques2 === 0) {
+                try {
+                    // Actualizar partidas jugadas de ambos jugadores
+                    const jugador1Id = io.sockets.sockets.get(jugador1).handshake.query.playerId;
+                    const jugador2Id = io.sockets.sockets.get(jugador2).handshake.query.playerId;
 
-            try {
-                // Actualizar el respeto del ganador
-                const ganadorId = io.sockets.sockets.get(ganador).handshake.query.playerId;
-                const resultadoGanador = await playersCollection.findOneAndUpdate({ userId: ganadorId }, {
-                    $inc: { respeto: 1, partidas: 1 }
-                }, { returnDocument: 'after' });
+                    const resultado1 = await playersCollection.findOneAndUpdate({ userId: jugador1Id }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
 
-                // Actualizar partidas jugadas del perdedor
-                const perdedorId = io.sockets.sockets.get(perdedor).handshake.query.playerId;
-                const resultadoPerdedor = await playersCollection.findOneAndUpdate({ userId: perdedorId }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
+                    const resultado2 = await playersCollection.findOneAndUpdate({ userId: jugador2Id }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
 
-                // Notificar a los jugadores
-                io.to(ganador).emit('victoria');
-                io.to(perdedor).emit('derrota');
+                    // Notificar a los jugadores
+                    io.to(jugador1).emit('empate');
+                    io.to(jugador2).emit('empate');
 
-                // Enviar actualización de puntaje a ambos jugadores
-                io.to(ganador).emit('actualizarPuntaje', {
-                    respeto: resultadoGanador.value.respeto,
-                    partidas: resultadoGanador.value.partidas
-                });
+                    // Enviar actualización de puntaje
+                    io.to(jugador1).emit('actualizarPuntaje', {
+                        respeto: resultado1.value.respeto,
+                        partidas: resultado1.value.partidas
+                    });
 
-                io.to(perdedor).emit('actualizarPuntaje', {
-                    respeto: resultadoPerdedor.value.respeto,
-                    partidas: resultadoPerdedor.value.partidas
-                });
+                    io.to(jugador2).emit('actualizarPuntaje', {
+                        respeto: resultado2.value.respeto,
+                        partidas: resultado2.value.partidas
+                    });
 
-                console.log(`Jugador ${ganadorId} ganó con ${Math.max(toques1, toques2)} toques`);
-            } catch (err) {
-                console.error('Error actualizando puntuaciones:', err);
-                io.to(ganador).emit('error', 'Error al actualizar puntuación');
-                io.to(perdedor).emit('error', 'Error al actualizar puntuación');
+                    console.log(`Empate entre ${jugador1Id} y ${jugador2Id}`);
+                } catch (err) {
+                    console.error('Error actualizando puntuaciones:', err);
+                    io.to(jugador1).emit('error', 'Error al actualizar puntuación');
+                    io.to(jugador2).emit('error', 'Error al actualizar puntuación');
+                }
+            } else {
+                // Determinar ganador y perdedor
+                let ganador, perdedor;
+                if (toques1 === 0) {
+                    ganador = jugador2;
+                    perdedor = jugador1;
+                } else if (toques2 === 0) {
+                    ganador = jugador1;
+                    perdedor = jugador2;
+                } else {
+                    ganador = toques1 > toques2 ? jugador1 : jugador2;
+                    perdedor = toques1 > toques2 ? jugador2 : jugador1;
+                }
+
+                try {
+                    // Actualizar el respeto del ganador
+                    const ganadorId = io.sockets.sockets.get(ganador).handshake.query.playerId;
+                    const resultadoGanador = await playersCollection.findOneAndUpdate({ userId: ganadorId }, { $inc: { respeto: 1, partidas: 1 } }, { returnDocument: 'after' });
+
+                    // Actualizar partidas jugadas del perdedor
+                    const perdedorId = io.sockets.sockets.get(perdedor).handshake.query.playerId;
+                    const resultadoPerdedor = await playersCollection.findOneAndUpdate({ userId: perdedorId }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
+
+                    // Notificar a los jugadores
+                    io.to(ganador).emit('victoria');
+                    io.to(perdedor).emit('derrota');
+
+                    // Enviar actualización de puntaje a ambos jugadores
+                    io.to(ganador).emit('actualizarPuntaje', {
+                        respeto: resultadoGanador.value.respeto,
+                        partidas: resultadoGanador.value.partidas
+                    });
+
+                    io.to(perdedor).emit('actualizarPuntaje', {
+                        respeto: resultadoPerdedor.value.respeto,
+                        partidas: resultadoPerdedor.value.partidas
+                    });
+
+                    console.log(`Jugador ${ganadorId} ganó con ${Math.max(toques1, toques2)} toques`);
+                } catch (err) {
+                    console.error('Error actualizando puntuaciones:', err);
+                    io.to(ganador).emit('error', 'Error al actualizar puntuación');
+                    io.to(perdedor).emit('error', 'Error al actualizar puntuación');
+                }
             }
 
             // Limpiar estado del juego
