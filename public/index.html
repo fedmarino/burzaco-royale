@@ -22,26 +22,27 @@
         </div>
     </div>
 
-    <!-- Sección de nombre (visible solo cuando estás logueado) -->
+    <!-- Sección de nombre y estadísticas (visible solo cuando estás logueado) -->
     <div id="seccionNombre" style="display: none;">
-        <p>Nombre: <span id="nombre">Anónimo</span> (<span id="respeto">0</span> respeto)</p>
-        <div id="cambiarNombre" style="display: none;">
-            <input type="text" id="nombreInput" placeholder="Escribí tu nombre" />
-            <input type="password" id="passwordInput" placeholder="Contraseña" />
-            <button id="guardarNombre">Guardar</button>
+        <div class="user-info">
+            <p>Nombre: <span id="nombre">Anónimo</span> (<span id="respeto">0</span> respeto)</p>
+            <p>Partidas jugadas: <span id="partidas">0</span></p>
+            <div class="user-actions">
+                <div id="cambiarNombre" style="display: none;">
+                    <input type="text" id="nombreInput" placeholder="Escribí tu nombre" />
+                    <input type="password" id="passwordInput" placeholder="Contraseña" />
+                    <button id="guardarNombre">Guardar</button>
+                </div>
+                <button id="editarNombre" style="display: none;">Cambiar nombre</button>
+                <button id="logoutBtn">Logout</button>
+            </div>
         </div>
-        <button id="editarNombre" style="display: none;">Cambiar nombre</button>
-        <button id="logoutBtn">Logout</button>
     </div>
 
-    <!-- Sección de estadísticas -->
-    <div id="estadisticas" style="display: none;">
-        <p>Respeto: <span id="respeto">0</span></p>
-        <p>Partidas jugadas: <span id="partidas">0</span></p>
+    <!-- Botón principal de juego -->
+    <div class="main-action">
+        <button id="ganarRespetoBtn" style="display: none;">GANAR RESPETO</button>
     </div>
-
-    <!-- Botón para pasar a la pantalla de combate -->
-    <button id="ganarRespetoBtn" style="display: none;">GANAR RESPETO</button>
 
     <!-- Ranking -->
     <div class="ranking-section">
