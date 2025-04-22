@@ -21,11 +21,21 @@ const DB_NAME = "burzaco-royale";
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: 100, // límite de 100 peticiones por ventana
-    message: "Demasiadas peticiones, por favor intenta más tarde"
+    message: "Demasiadas peticiones, por favor intenta más tarde",
+    skip: (req) => {
+        // No aplicar rate limiting a las rutas de login y ranking
+        return req.path === '/api/login' || req.path === '/api/ranking';
+    }
 });
 
-// Aplicar rate limiting a todas las rutas
-app.use(limiter);
+// Aplicar rate limiting a todas las rutas excepto las estáticas
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        limiter(req, res, next);
+    } else {
+        next();
+    }
+});
 
 let db, playersCollection;
 
