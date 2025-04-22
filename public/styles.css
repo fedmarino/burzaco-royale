@@ -378,3 +378,46 @@ button:hover {
         padding: var(--padding-base);
     }
 }
+
+.contadores {
+    display: flex;
+    justify-content: space-around;
+    margin: var(--margin-base) 0;
+    font-size: var(--font-size-base);
+    text-align: center;
+}
+
+.boton-principal {
+    width: 80%;
+    max-width: 400px;
+    font-size: var(--font-size-base);
+    padding: var(--padding-base);
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    text-transform: uppercase;
+    box-shadow: 0 0 12px #ff0000;
+    margin: var(--margin-base) auto;
+    display: block;
+}
+
+.boton-principal:hover {
+    transform: scale(1.05);
+}
+
+.boton-principal:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .boton-principal {
+        width: 90%;
+        font-size: var(--font-size-small);
+    }
+    .contadores {
+        font-size: var(--font-size-small);
+    }
+}

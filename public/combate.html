@@ -4,40 +4,59 @@
 <head>
     <meta charset="UTF-8" />
     <title>Burzaco Royale - Combate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <h1>¡Combate en Burzaco!</h1>
+    <div class="container">
+        <h1>Combate</h1>
 
-    <!-- Información de los jugadores -->
-    <div id="infoCombate" style="display: none;">
-        <div class="jugador-info">
-            <h3 id="jugador1Nombre">Jugador 1</h3>
-            <p>Respeto: <span id="jugador1Respeto">0</span></p>
-            <p>Ranking: <span id="jugador1Ranking">#0</span></p>
+        <div id="infoCombate" style="display: none;">
+            <div class="jugador-info">
+                <h3>Jugador 1</h3>
+                <p>Nombre: <span id="jugador1Nombre">-</span></p>
+                <p>Respeto: <span id="jugador1Respeto">0</span></p>
+                <p>Ranking: <span id="jugador1Ranking">#0</span></p>
+            </div>
+
+            <div class="vs">VS</div>
+
+            <div class="jugador-info">
+                <h3>Jugador 2</h3>
+                <p>Nombre: <span id="jugador2Nombre">-</span></p>
+                <p>Respeto: <span id="jugador2Respeto">0</span></p>
+                <p>Ranking: <span id="jugador2Ranking">#0</span></p>
+            </div>
         </div>
-        <div class="vs">VS</div>
-        <div class="jugador-info">
-            <h3 id="jugador2Nombre">Jugador 2</h3>
-            <p>Respeto: <span id="jugador2Respeto">0</span></p>
-            <p>Ranking: <span id="jugador2Ranking">#0</span></p>
+
+        <div id="estadoCombate">Esperando rival...</div>
+
+        <div class="contadores">
+            <div id="contadorToques">Toques: 0</div>
+            <div id="tiempoRestante">Tiempo: 5</div>
         </div>
+
+        <div class="main-action">
+            <button id="golpearBtn" class="boton-principal">GOLPEAR</button>
+        </div>
+
+        <button id="volverBtn">Volver</button>
     </div>
-
-    <div id="estadoCombate">Buscando rival...</div>
-    <div id="contadorToques">Toques: 0</div>
-    <div id="tiempoRestante">Tiempo: 5</div>
-    <button id="golpearBtn" class="boton-grande" style="display: none;">¡GOLPEAR!</button>
-    <button id="volverBtn" style="display: none;">Volver al Inicio</button>
-
-    <!-- Ranking -->
-    <h2>Ranking Barrial</h2>
-    <ol id="ranking"></ol>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="combate.js"></script>
+    <img src="assets/fondo-callejero.png" alt="Burzaco Pixelado" class="footer-bg">
+    <footer>
+        <div id="notaalpie-bg">
+            <div id="notaalpie">
+                <p>Burzaco Royale - Todos los derechos reservados</p>
+                <p>Proyecto en curso por Federico Marino. Burzaco, Buenos Aires, Argentina</p>
+                <p>abril, 2025</p>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>
