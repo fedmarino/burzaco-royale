@@ -400,7 +400,7 @@ button:hover {
     transition: transform 0.1s;
     text-transform: uppercase;
     box-shadow: 0 0 12px #ff0000;
-    margin: var(--margin-base) auto;
+    margin: 0 auto;
     display: block;
 }
 
@@ -412,12 +412,26 @@ button:hover {
     transform: scale(0.95);
 }
 
+.volver-container {
+    margin-top: calc(var(--margin-base) * 3);
+    text-align: center;
+    padding: var(--padding-base);
+}
+
+#volverBtn {
+    background-color: #333;
+    color: #fdd835;
+    border: 2px solid #fdd835;
+    padding: var(--padding-small);
+    font-size: var(--font-size-small);
+}
+
 @media (max-width: 768px) {
     .boton-principal {
         width: 90%;
         font-size: var(--font-size-small);
     }
-    .contadores {
-        font-size: var(--font-size-small);
+    .volver-container {
+        margin-top: calc(var(--margin-base) * 2);
     }
 }
