@@ -325,9 +325,14 @@ button:hover {
     text-align: center;
     margin: var(--margin-base) 0;
     padding: var(--padding-base);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.boton-principal {
+.boton-principal,
+#ganarRespetoBtn,
+#golpearBtn {
     width: 200px;
     height: 200px;
     font-size: var(--font-size-base);
@@ -351,7 +356,9 @@ button:hover {
     line-height: 1.2;
 }
 
-.boton-principal::before {
+.boton-principal::before,
+#ganarRespetoBtn::before,
+#golpearBtn::before {
     content: '';
     position: absolute;
     top: 0;
@@ -363,68 +370,22 @@ button:hover {
     z-index: 1;
 }
 
-.boton-principal:hover {
+.boton-principal:hover,
+#ganarRespetoBtn:hover,
+#golpearBtn:hover {
     transform: scale(1.05);
 }
 
-.boton-principal:active {
+.boton-principal:active,
+#ganarRespetoBtn:active,
+#golpearBtn:active {
     transform: scale(0.95);
 }
 
 @media (max-width: 768px) {
-    .boton-principal {
-        width: 200px;
-        height: 200px;
-        font-size: var(--font-size-small);
-    }
-}
-
-#ganarRespetoBtn {
-    width: 200px;
-    height: 200px;
-    font-size: var(--font-size-base);
-    padding: var(--padding-base);
-    background-color: #ff4444;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.1s;
-    text-transform: uppercase;
-    box-shadow: 0 0 12px #ff0000;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    border-radius: 50%;
-    overflow: hidden;
-    font-family: 'Press Start 2P', cursive;
-    text-align: center;
-    line-height: 1.2;
-}
-
-#ganarRespetoBtn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, transparent 50%, #ff4444 50%);
-    border-radius: 50%;
-    z-index: 1;
-}
-
-#ganarRespetoBtn:hover {
-    transform: scale(1.05);
-}
-
-#ganarRespetoBtn:active {
-    transform: scale(0.95);
-}
-
-@media (max-width: 768px) {
-    #ganarRespetoBtn {
+    .boton-principal,
+    #ganarRespetoBtn,
+    #golpearBtn {
         width: 200px;
         height: 200px;
         font-size: var(--font-size-small);

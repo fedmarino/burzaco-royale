@@ -378,8 +378,8 @@ io.on('connection', (socket) => {
                 jugador2: { id: io.sockets.sockets.get(jugador2).handshake.query.playerId, toques: toques2 }
             });
 
-            // Si ambos jugadores tienen 0 toques, es un empate
-            if (toques1 === 0 && toques2 === 0) {
+            // Si ambos jugadores tienen el mismo número de toques, es un empate
+            if (toques1 === toques2) {
                 try {
                     // Actualizar partidas jugadas de ambos jugadores
                     const jugador1Id = io.sockets.sockets.get(jugador1).handshake.query.playerId;
@@ -415,15 +415,12 @@ io.on('connection', (socket) => {
             } else {
                 // Determinar ganador y perdedor
                 let ganador, perdedor;
-                if (toques1 === 0) {
-                    ganador = jugador2;
-                    perdedor = jugador1;
-                } else if (toques2 === 0) {
+                if (toques1 > toques2) {
                     ganador = jugador1;
                     perdedor = jugador2;
                 } else {
-                    ganador = toques1 > toques2 ? jugador1 : jugador2;
-                    perdedor = toques1 > toques2 ? jugador2 : jugador1;
+                    ganador = jugador2;
+                    perdedor = jugador1;
                 }
 
                 try {
