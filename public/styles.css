@@ -207,7 +207,7 @@ button:hover {
 }
 
 .ranking-section h2 {
-    text-align: center;
+    text-align: left;
     margin-bottom: 1rem;
 }
 
@@ -222,5 +222,5 @@ button:hover {
     margin: 0.5rem 0;
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
-    text-align: center;
+    text-align: left;
 }

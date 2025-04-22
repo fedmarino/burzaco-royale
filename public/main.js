@@ -189,8 +189,14 @@ function inicializarSocket() {
 
     socket.on("actualizarPuntaje", (data) => {
         console.log("[Main] Actualizando puntaje:", data);
-        respetoDisplay.textContent = data.respeto;
-        partidasDisplay.textContent = data.partidas;
+        // Actualizar todos los elementos que muestran respeto y partidas
+        const respetoElements = document.querySelectorAll("#respeto, #respetoUsuario, #respetoStats");
+        const partidasElements = document.querySelectorAll("#partidas");
+
+        respetoElements.forEach(el => el.textContent = data.respeto);
+        partidasElements.forEach(el => el.textContent = data.partidas);
+
+        // Actualizar ranking
         cargarRanking();
     });
 }
@@ -262,7 +268,7 @@ async function cargarRanking() {
         lista.innerHTML = "";
         ranking.forEach((jugador, i) => {
             const li = document.createElement("li");
-            li.textContent = `${i + 1}. ${jugador.nombre} (${jugador.respeto} Respeto)`;
+            li.textContent = `${i + 1}. ${jugador.nombre} (${jugador.respeto} Respeto - ${jugador.partidas} Partidas)`;
             lista.appendChild(li);
         });
         console.log("[Main] Ranking actualizado en el DOM");

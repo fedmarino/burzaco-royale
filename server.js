@@ -261,7 +261,7 @@ app.post("/api/cambiar-nombre", async(req, res) => {
 app.get("/api/ranking", async(req, res) => {
     try {
         const ranking = await playersCollection
-            .find({ respeto: { $gt: 0 } }, { projection: { _id: 0, nombre: 1, respeto: 1 } })
+            .find({ respeto: { $gt: 0 } }, { projection: { _id: 0, nombre: 1, respeto: 1, partidas: 1 } })
             .sort({ respeto: -1 })
             .limit(10)
             .toArray();
