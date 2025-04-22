@@ -328,6 +328,10 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    max-width: 200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .boton-principal,
@@ -354,6 +358,7 @@ button:hover {
     font-family: 'Press Start 2P', cursive;
     text-align: center;
     line-height: 1.2;
+    flex-shrink: 0;
 }
 
 .boton-principal::before,
@@ -383,12 +388,17 @@ button:hover {
 }
 
 @media (max-width: 768px) {
+    .main-action {
+        max-width: 200px;
+        margin: var(--margin-base) auto;
+    }
     .boton-principal,
     #ganarRespetoBtn,
     #golpearBtn {
         width: 200px;
         height: 200px;
         font-size: var(--font-size-small);
+        flex-shrink: 0;
     }
 }
 

@@ -387,9 +387,14 @@ io.on('connection', (socket) => {
 
                     console.log("[Server] Actualizando empate para jugadores:", jugador1Id, "y", jugador2Id);
 
-                    const resultado1 = await playersCollection.findOneAndUpdate({ userId: jugador1Id }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
+                    // Actualizar partidas jugadas
+                    await playersCollection.updateOne({ userId: jugador1Id }, { $inc: { partidas: 1 } });
 
-                    const resultado2 = await playersCollection.findOneAndUpdate({ userId: jugador2Id }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
+                    await playersCollection.updateOne({ userId: jugador2Id }, { $inc: { partidas: 1 } });
+
+                    // Obtener los valores actualizados
+                    const resultado1 = await playersCollection.findOne({ userId: jugador1Id });
+                    const resultado2 = await playersCollection.findOne({ userId: jugador2Id });
 
                     // Notificar a los jugadores
                     io.to(jugador1).emit('empate');
@@ -397,13 +402,13 @@ io.on('connection', (socket) => {
 
                     // Enviar actualización de puntaje
                     io.to(jugador1).emit('actualizarPuntaje', {
-                        respeto: resultado1.value.respeto,
-                        partidas: resultado1.value.partidas
+                        respeto: resultado1.respeto,
+                        partidas: resultado1.partidas
                     });
 
                     io.to(jugador2).emit('actualizarPuntaje', {
-                        respeto: resultado2.value.respeto,
-                        partidas: resultado2.value.partidas
+                        respeto: resultado2.respeto,
+                        partidas: resultado2.partidas
                     });
 
                     console.log(`[Server] Empate procesado entre ${jugador1Id} y ${jugador2Id}`);
@@ -430,9 +435,14 @@ io.on('connection', (socket) => {
 
                     console.log("[Server] Actualizando victoria/derrota para jugadores:", ganadorId, "y", perdedorId);
 
-                    const resultadoGanador = await playersCollection.findOneAndUpdate({ userId: ganadorId }, { $inc: { respeto: 1, partidas: 1 } }, { returnDocument: 'after' });
+                    // Actualizar partidas jugadas y respeto
+                    await playersCollection.updateOne({ userId: ganadorId }, { $inc: { respeto: 1, partidas: 1 } });
 
-                    const resultadoPerdedor = await playersCollection.findOneAndUpdate({ userId: perdedorId }, { $inc: { partidas: 1 } }, { returnDocument: 'after' });
+                    await playersCollection.updateOne({ userId: perdedorId }, { $inc: { partidas: 1 } });
+
+                    // Obtener los valores actualizados
+                    const resultadoGanador = await playersCollection.findOne({ userId: ganadorId });
+                    const resultadoPerdedor = await playersCollection.findOne({ userId: perdedorId });
 
                     // Notificar a los jugadores
                     io.to(ganador).emit('victoria');
@@ -440,13 +450,13 @@ io.on('connection', (socket) => {
 
                     // Enviar actualización de puntaje a ambos jugadores
                     io.to(ganador).emit('actualizarPuntaje', {
-                        respeto: resultadoGanador.value.respeto,
-                        partidas: resultadoGanador.value.partidas
+                        respeto: resultadoGanador.respeto,
+                        partidas: resultadoGanador.partidas
                     });
 
                     io.to(perdedor).emit('actualizarPuntaje', {
-                        respeto: resultadoPerdedor.value.respeto,
-                        partidas: resultadoPerdedor.value.partidas
+                        respeto: resultadoPerdedor.respeto,
+                        partidas: resultadoPerdedor.partidas
                     });
 
                     console.log(`[Server] Victoria procesada para ${ganadorId} con ${Math.max(toques1, toques2)} toques`);
