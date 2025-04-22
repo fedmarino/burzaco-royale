@@ -358,14 +358,13 @@ button:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at center, transparent 30%, #ff4444 30%);
+    background: radial-gradient(circle at center, transparent 50%, #ff4444 50%);
     border-radius: 50%;
     z-index: 1;
 }
 
 .boton-principal:hover {
     transform: scale(1.05);
-    background-color: #ff3333;
 }
 
 .boton-principal:active {
@@ -374,8 +373,8 @@ button:hover {
 
 @media (max-width: 768px) {
     .boton-principal {
-        width: 250px;
-        height: 250px;
+        width: 200px;
+        height: 200px;
         font-size: var(--font-size-small);
     }
 }
@@ -411,14 +410,13 @@ button:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at center, transparent 30%, #ff4444 30%);
+    background: radial-gradient(circle at center, transparent 50%, #ff4444 50%);
     border-radius: 50%;
     z-index: 1;
 }
 
 #ganarRespetoBtn:hover {
     transform: scale(1.05);
-    background-color: #ff3333;
 }
 
 #ganarRespetoBtn:active {
@@ -427,8 +425,8 @@ button:hover {
 
 @media (max-width: 768px) {
     #ganarRespetoBtn {
-        width: 250px;
-        height: 250px;
+        width: 200px;
+        height: 200px;
         font-size: var(--font-size-small);
     }
 }
