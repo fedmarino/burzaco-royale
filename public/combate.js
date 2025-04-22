@@ -24,6 +24,7 @@ let contadorToques = 0;
 let tiempoRestante = 5;
 let temporizador;
 let juegoActivo = false;
+let juegoTerminado = false;
 
 // Cargar ranking inicial
 cargarRanking();
@@ -65,6 +66,7 @@ socket.on("startGame", (data) => {
 
 function iniciarJuego() {
     juegoActivo = true;
+    juegoTerminado = false;
     contadorToques = 0;
     tiempoRestante = 5;
     actualizarContadores();
@@ -73,7 +75,8 @@ function iniciarJuego() {
         tiempoRestante--;
         tiempoRestanteEl.textContent = `Tiempo: ${tiempoRestante}`;
 
-        if (tiempoRestante <= 0) {
+        if (tiempoRestante <= 0 && !juegoTerminado) {
+            juegoTerminado = true;
             clearInterval(temporizador);
             juegoActivo = false;
             golpearBtn.style.display = "none";
@@ -86,6 +89,7 @@ function iniciarJuego() {
 function reiniciarJuego() {
     clearInterval(temporizador);
     juegoActivo = false;
+    juegoTerminado = false;
     contadorToques = 0;
     tiempoRestante = 5;
     actualizarContadores();
