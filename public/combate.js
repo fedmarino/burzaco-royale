@@ -77,6 +77,7 @@ function iniciarJuego() {
             clearInterval(temporizador);
             juegoActivo = false;
             golpearBtn.style.display = "none";
+            console.log("[Combate] Emitiendo finJuego con", contadorToques, "toques");
             socket.emit("finJuego", contadorToques);
         }
     }, 1000);

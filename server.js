@@ -354,6 +354,7 @@ io.on('connection', (socket) => {
 
     socket.on('finJuego', async(toques) => {
         const playerId = socket.handshake.query.playerId;
+        console.log("[Server] Recibido finJuego de", playerId, "con", toques, "toques");
         jugadoresEnJuego.set(socket.id, toques);
 
         // Verificar si ambos jugadores han terminado o si ha pasado suficiente tiempo
@@ -361,6 +362,11 @@ io.on('connection', (socket) => {
         if (jugadores.length === 2) {
             const [jugador1, toques1] = jugadores[0];
             const [jugador2, toques2] = jugadores[1];
+
+            console.log("[Server] Ambos jugadores terminaron:", {
+                jugador1: { id: io.sockets.sockets.get(jugador1).handshake.query.playerId, toques: toques1 },
+                jugador2: { id: io.sockets.sockets.get(jugador2).handshake.query.playerId, toques: toques2 }
+            });
 
             // Si ambos jugadores tienen 0 toques, es un empate
             if (toques1 === 0 && toques2 === 0) {
@@ -409,7 +415,7 @@ io.on('connection', (socket) => {
                 }
 
                 try {
-                    // Actualizar el respeto del ganador
+                    // Actualizar el respeto del ganador y partidas jugadas
                     const ganadorId = io.sockets.sockets.get(ganador).handshake.query.playerId;
                     const resultadoGanador = await playersCollection.findOneAndUpdate({ userId: ganadorId }, { $inc: { respeto: 1, partidas: 1 } }, { returnDocument: 'after' });
 
