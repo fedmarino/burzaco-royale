@@ -288,7 +288,7 @@ app.get("/api/ranking", async(req, res) => {
 // =======================================
 let jugadoresEnEspera = [];
 let jugadoresEnJuego = new Map(); // Almacena los toques de cada jugador
-let partidasEnProceso = new Set(); // Nuevo: para controlar partidas ya procesadas
+let partidasEnProceso = new Map(); // Almacena las partidas en proceso con sus jugadores
 
 io.on('connection', (socket) => {
     console.log('Nuevo jugador conectado:', socket.id);
@@ -301,9 +301,17 @@ io.on('connection', (socket) => {
             const jugador1 = jugadoresEnEspera.shift();
             const jugador2 = jugadoresEnEspera.shift();
 
+            // Generar un ID único para la partida
+            const partidaId = `${io.sockets.sockets.get(jugador1).handshake.query.playerId}-${io.sockets.sockets.get(jugador2).handshake.query.playerId}-${Date.now()}`;
+
             // Inicializar contadores para ambos jugadores
             jugadoresEnJuego.set(jugador1, 0);
             jugadoresEnJuego.set(jugador2, 0);
+            partidasEnProceso.set(partidaId, {
+                jugador1: { id: jugador1, userId: io.sockets.sockets.get(jugador1).handshake.query.playerId },
+                jugador2: { id: jugador2, userId: io.sockets.sockets.get(jugador2).handshake.query.playerId },
+                procesada: false
+            });
 
             // Obtener información de los jugadores
             Promise.all([
@@ -357,13 +365,24 @@ io.on('connection', (socket) => {
         const playerId = socket.handshake.query.playerId;
         console.log("[Server] Recibido finJuego de", playerId, "con", toques, "toques");
 
-        // Verificar si esta partida ya fue procesada
-        const partidaId = `${socket.id}-${Date.now()}`;
-        if (partidasEnProceso.has(partidaId)) {
+        // Buscar la partida en proceso para este jugador
+        let partidaActual = null;
+        for (const [partidaId, partida] of partidasEnProceso.entries()) {
+            if (partida.jugador1.userId === playerId || partida.jugador2.userId === playerId) {
+                partidaActual = { partidaId, partida };
+                break;
+            }
+        }
+
+        if (!partidaActual) {
+            console.log("[Server] No se encontró partida en proceso para el jugador:", playerId);
+            return;
+        }
+
+        if (partidaActual.partida.procesada) {
             console.log("[Server] Partida ya procesada, ignorando");
             return;
         }
-        partidasEnProceso.add(partidaId);
 
         jugadoresEnJuego.set(socket.id, toques);
 
@@ -378,6 +397,9 @@ io.on('connection', (socket) => {
                 jugador2: { id: io.sockets.sockets.get(jugador2).handshake.query.playerId, toques: toques2 }
             });
 
+            // Marcar la partida como procesada
+            partidasEnProceso.get(partidaActual.partidaId).procesada = true;
+
             // Si ambos jugadores tienen el mismo número de toques, es un empate
             if (toques1 === toques2) {
                 try {
@@ -389,7 +411,6 @@ io.on('connection', (socket) => {
 
                     // Actualizar partidas jugadas
                     await playersCollection.updateOne({ userId: jugador1Id }, { $inc: { partidas: 1 } });
-
                     await playersCollection.updateOne({ userId: jugador2Id }, { $inc: { partidas: 1 } });
 
                     // Obtener los valores actualizados
@@ -437,7 +458,6 @@ io.on('connection', (socket) => {
 
                     // Actualizar partidas jugadas y respeto
                     await playersCollection.updateOne({ userId: ganadorId }, { $inc: { respeto: 1, partidas: 1 } });
-
                     await playersCollection.updateOne({ userId: perdedorId }, { $inc: { partidas: 1 } });
 
                     // Obtener los valores actualizados
@@ -470,7 +490,7 @@ io.on('connection', (socket) => {
             // Limpiar estado del juego
             jugadoresEnJuego.clear();
             // Limpiar la partida procesada después de un tiempo
-            setTimeout(() => partidasEnProceso.delete(partidaId), 10000);
+            setTimeout(() => partidasEnProceso.delete(partidaActual.partidaId), 10000);
         }
     });
 
