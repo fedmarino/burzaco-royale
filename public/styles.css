@@ -31,6 +31,14 @@ body {
     padding: var(--padding-base);
     padding-bottom: 200px;
     font-size: var(--font-size-base);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .container {
@@ -332,6 +340,8 @@ button:hover {
     transition: transform 0.1s;
     text-transform: uppercase;
     box-shadow: 0 0 12px #ff0000;
+    margin: 0 auto;
+    display: block;
 }
 
 #ganarRespetoBtn:hover {
@@ -344,14 +354,17 @@ button:hover {
 
 @media (max-width: 768px) {
     .user-actions {
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: center;
     }
     .user-actions button {
-        width: 100%;
+        width: auto;
+        min-width: 120px;
     }
     #ganarRespetoBtn {
         width: 90%;
         font-size: var(--font-size-small);
+        margin-top: calc(var(--margin-base) * 2);
     }
 }
 
@@ -388,9 +401,8 @@ button:hover {
 }
 
 .boton-principal {
-    width: 80%;
-    max-width: 400px;
-    height: 80px;
+    width: 200px;
+    height: 200px;
     font-size: var(--font-size-base);
     padding: var(--padding-base);
     background-color: #ff4444;
@@ -403,15 +415,36 @@ button:hover {
     margin: 0 auto;
     display: block;
     position: relative;
-    clip-path: polygon( 50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    border-radius: 50%;
+    clip-path: polygon( 50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%, 50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%, 50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%, 50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%, 50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 
-.boton-principal:hover {
-    transform: scale(1.05);
+.boton-principal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, transparent 30%, #ff4444 30%);
+    border-radius: 50%;
+    z-index: 1;
 }
 
-.boton-principal:active {
-    transform: scale(0.95);
+.boton-principal span {
+    position: relative;
+    z-index: 2;
+    display: block;
+    margin-top: 50%;
+    transform: translateY(-50%);
+}
+
+@media (max-width: 768px) {
+    .boton-principal {
+        width: 250px;
+        height: 250px;
+        font-size: var(--font-size-small);
+    }
 }
 
 .volver-container {
